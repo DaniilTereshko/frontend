@@ -1,0 +1,213 @@
+[
+  {
+    "uri": {
+      "specId": "apidocs.json",
+      "type": "specification",
+      "identifier": "apidocs.json"
+    },
+    "operations": [
+      {
+        "path": "/api/v1/tests/{id}",
+        "method": "put",
+        "description": "Обновить существующий тест",
+        "operationId": "update"
+      },
+      {
+        "path": "/api/v1/tests/{id}",
+        "method": "delete",
+        "description": "Удалить существующий тест",
+        "operationId": "delete"
+      },
+      {
+        "path": "/api/v1/courses/{id}",
+        "method": "get",
+        "description": "Получить курс по идентификатору",
+        "operationId": "get"
+      },
+      {
+        "path": "/api/v1/courses/{id}",
+        "method": "put",
+        "description": "Обновить курс",
+        "operationId": "update_1"
+      },
+      {
+        "path": "/api/v1/courses/{id}",
+        "method": "delete",
+        "description": "Удалить курс",
+        "operationId": "delete_1"
+      },
+      {
+        "path": "/api/v1/tests/{id}/submit",
+        "method": "post",
+        "description": "Пользователь отправляет свои ответы и завершает текущую активную попытку",
+        "operationId": "submit"
+      },
+      {
+        "path": "/api/v1/tests/{id}/start",
+        "method": "post",
+        "description": "Пользователь начинает попытку прохождения",
+        "operationId": "startTest"
+      },
+      {
+        "path": "/api/v1/tests/courses/{courseId}",
+        "method": "post",
+        "description": "Создать новый тест для указанного курса",
+        "operationId": "create"
+      },
+      {
+        "path": "/api/v1/questions/tests/{testId}",
+        "method": "get",
+        "description": "Получить список всех вопросов для указанного теста",
+        "operationId": "getTestQuestions"
+      },
+      {
+        "path": "/api/v1/questions/tests/{testId}",
+        "method": "post",
+        "description": "Создать новый вопрос для указанного теста",
+        "operationId": "create_1"
+      },
+      {
+        "path": "/api/v1/courses",
+        "method": "get",
+        "description": "Получить список всех курсов с пагинацией",
+        "operationId": "get_1"
+      },
+      {
+        "path": "/api/v1/courses",
+        "method": "post",
+        "description": "Создать курс",
+        "operationId": "create_2"
+      },
+      {
+        "path": "/api/v1/courses/{courseId}/assign/{userId}",
+        "method": "post",
+        "description": "Назначить курс пользователю",
+        "operationId": "assign"
+      },
+      {
+        "path": "/api/v1/auth/register",
+        "method": "post",
+        "description": "Позволяет зарегистрировать нового пользователя в системе",
+        "operationId": "register"
+      },
+      {
+        "path": "/api/v1/auth/refresh-token",
+        "method": "post",
+        "description": "Позволяет обновить токены доступа и обновления, используя refresh токен",
+        "operationId": "refreshToken"
+      },
+      {
+        "path": "/api/v1/auth/login",
+        "method": "post",
+        "description": "Позволяет пользователю войти в систему, получив токены доступа и обновления",
+        "operationId": "login"
+      },
+      {
+        "path": "/api/v1/users",
+        "method": "get",
+        "description": "Получить список всех пользователей с пагинацией",
+        "operationId": "get_2"
+      },
+      {
+        "path": "/api/v1/tests/{id}/results",
+        "method": "get",
+        "description": "Возвращает список всех результатов прохождения указанного теста по пользователю",
+        "operationId": "getTestResults"
+      },
+      {
+        "path": "/api/v1/tests/course/{courseId}",
+        "method": "get",
+        "description": "Получить список всех тестов для указанного курса",
+        "operationId": "getCourseTests"
+      },
+      {
+        "path": "/api/v1/questions/{id}",
+        "method": "delete",
+        "description": "Удалить существующий вопрос",
+        "operationId": "delete_2"
+      }
+    ],
+    "schemas": [
+      {
+        "name": "TestRequest",
+        "description": "Запрос на создание/обновление теста"
+      },
+      {
+        "name": "ErrorResponse",
+        "description": "Унифицированный ответ ошибки"
+      },
+      {
+        "name": "FieldErrorResponse",
+        "description": "Ошибка валидации поля"
+      },
+      {
+        "name": "TestDto",
+        "description": "Тест"
+      },
+      {
+        "name": "CourseRequest",
+        "description": "Запрос на создание/обновление курса"
+      },
+      {
+        "name": "CourseDto",
+        "description": "Курс"
+      },
+      {
+        "name": "UserDto",
+        "description": "Информация о создателе курса"
+      },
+      {
+        "name": "TestSubmissionRequest",
+        "description": "Запрос для отправки результатов теста"
+      },
+      {
+        "name": "UserAnswerRequest",
+        "description": "Запрос ответа пользователя на вопрос"
+      },
+      {
+        "name": "AnswerRequest",
+        "description": "Запрос на создание/обновление ответа"
+      },
+      {
+        "name": "CreateQuestionRequest",
+        "description": "Запрос на создание/обновление вопроса"
+      },
+      {
+        "name": "AnswerDto",
+        "description": "Ответ на вопрос"
+      },
+      {
+        "name": "QuestionDto",
+        "description": "Вопрос теста"
+      },
+      {
+        "name": "RegistrationRequest",
+        "description": "Запрос на регистрацию пользователя"
+      },
+      {
+        "name": "LoginResponse",
+        "description": "Ответ, содержащий токены доступа и обновления"
+      },
+      {
+        "name": "LoginRequest",
+        "description": "Запрос на вход пользователя"
+      },
+      {
+        "name": "PageDtoUserDto",
+        "description": "Страница"
+      },
+      {
+        "name": "PageDtoTestResultDto",
+        "description": "Страница"
+      },
+      {
+        "name": "TestResultDto",
+        "description": "Результат прохождения теста"
+      },
+      {
+        "name": "PageDtoCourseDto",
+        "description": "Страница"
+      }
+    ]
+  }
+]
