@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import HomePage from './pages/HomePage';
 import { getUserFromToken, removeToken } from './utils/auth';
 
 function AppHeader() {
@@ -57,10 +58,6 @@ function AppHeader() {
       )}
     </header>
   );
-}
-
-function HomePage() {
-  return <div className="container"></div>;
 }
 
 function App() {
