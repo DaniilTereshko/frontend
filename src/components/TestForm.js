@@ -10,6 +10,9 @@ function TestForm({ initial, onSubmit, onCancel, loading, errors, title }) {
   const [timeLimitMinutes, setTimeLimitMinutes] = useState(
     typeof initial?.timeLimitMinutes === 'number' ? initial.timeLimitMinutes : ''
   );
+  const [maxAttempts, setMaxAttempts] = useState(
+    typeof initial?.maxAttempts === 'number' ? initial.maxAttempts : ''
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,6 +21,7 @@ function TestForm({ initial, onSubmit, onCancel, loading, errors, title }) {
       description,
       passingScore: passingScore === '' ? null : Number(passingScore),
       timeLimitMinutes: timeLimitMinutes === '' ? null : Number(timeLimitMinutes),
+      maxAttempts: maxAttempts === '' ? null : Number(maxAttempts),
     });
   };
 
@@ -40,6 +44,10 @@ function TestForm({ initial, onSubmit, onCancel, loading, errors, title }) {
         <div>
           <label style={{fontWeight:700, fontSize:'1.13rem', marginBottom: 6, display:'block'}}>Ограничение по времени (минуты)</label>
           <input type="number" min="0" max="1000" value={timeLimitMinutes} onChange={e => setTimeLimitMinutes(e.target.value)} placeholder="Ограничение в минутах" style={{width:'100%', fontWeight:600, fontSize:'1.13rem', borderWidth:2, borderColor:'#ff9800', borderRadius:8, padding:'12px 14px', fontFamily:'Inter, Arial, sans-serif', boxSizing:'border-box'}} />
+        </div>
+        <div>
+          <label style={{fontWeight:700, fontSize:'1.13rem', marginBottom: 6, display:'block'}}>Максимум попыток</label>
+          <input type="number" min="0" max="1000" value={maxAttempts} onChange={e => setMaxAttempts(e.target.value)} placeholder="Не ограничено" style={{width:'100%', fontWeight:600, fontSize:'1.13rem', borderWidth:2, borderColor:'#ff9800', borderRadius:8, padding:'12px 14px', fontFamily:'Inter, Arial, sans-serif', boxSizing:'border-box'}} />
         </div>
         <div style={{display:'flex',gap:16,marginTop:8, width:'100%', justifyContent:'center'}}>
           <button type="submit" disabled={loading} style={{flex:1, fontWeight:700, fontSize:'1.13rem', padding:'12px 0', borderRadius:8, background:'linear-gradient(90deg, #ff9800 60%, #ffa726 100%)', color:'#fff', border:'none', boxShadow:'0 2px 8px rgba(255,152,0,0.10)', letterSpacing:'0.5px', cursor:'pointer', transition:'background 0.2s, box-shadow 0.2s'}}>Сохранить</button>

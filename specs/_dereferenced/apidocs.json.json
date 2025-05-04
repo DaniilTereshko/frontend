@@ -15,6 +15,10 @@
   ],
   "tags": [
     {
+      "name": "Файлы курсов",
+      "description": "Операции с файлами, прикреплёнными к курсам"
+    },
+    {
       "name": "Пользователи",
       "description": "Контроллер для операций над пользователями"
     },
@@ -83,6 +87,14 @@
                     "description": "Проходной балл",
                     "format": "int32",
                     "example": 70
+                  },
+                  "maxAttempts": {
+                    "maximum": 100,
+                    "minimum": 1,
+                    "type": "integer",
+                    "description": "Максимальное количество попыток на тест",
+                    "format": "int32",
+                    "example": 3
                   }
                 },
                 "description": "Запрос на создание/обновление теста"
@@ -119,6 +131,11 @@
                     "passingScore": {
                       "type": "integer",
                       "description": "Проходной балл",
+                      "format": "int32"
+                    },
+                    "maxAttempts": {
+                      "type": "integer",
+                      "description": "Максимальное количество попыток на тест",
                       "format": "int32"
                     }
                   },
@@ -1925,6 +1942,14 @@
                     "description": "Проходной балл",
                     "format": "int32",
                     "example": 70
+                  },
+                  "maxAttempts": {
+                    "maximum": 100,
+                    "minimum": 1,
+                    "type": "integer",
+                    "description": "Максимальное количество попыток на тест",
+                    "format": "int32",
+                    "example": 3
                   }
                 },
                 "description": "Запрос на создание/обновление теста"
@@ -1961,6 +1986,11 @@
                     "passingScore": {
                       "type": "integer",
                       "description": "Проходной балл",
+                      "format": "int32"
+                    },
+                    "maxAttempts": {
+                      "type": "integer",
+                      "description": "Максимальное количество попыток на тест",
                       "format": "int32"
                     }
                   },
@@ -2175,7 +2205,7 @@
           "Вопросы тестов"
         ],
         "summary": "Получение вопросов теста",
-        "description": "Получить список всех вопросов для указанного теста",
+        "description": "Получить список всех вопросов для указанного теста с пагинацией",
         "operationId": "getTestQuestions",
         "parameters": [
           {
@@ -2187,6 +2217,30 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Номер страницы (начиная с 0)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Количество элементов на странице",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "example": 10
           }
         ],
         "responses": {
@@ -2195,80 +2249,104 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "description": "Идентификатор вопроса",
-                        "format": "int64",
-                        "readOnly": true,
-                        "example": 1
-                      },
-                      "questionText": {
-                        "type": "string",
-                        "description": "Текст вопроса",
-                        "example": "Что такое ООП?"
-                      },
-                      "questionType": {
-                        "type": "string",
-                        "description": "Тип вопроса",
-                        "example": "SINGLE_CHOICE",
-                        "enum": [
-                          "SINGLE_CHOICE",
-                          "MULTIPLE_CHOICE",
-                          "TEXT"
-                        ]
-                      },
-                      "points": {
-                        "type": "integer",
-                        "description": "Количество баллов за вопрос",
-                        "format": "int32",
-                        "example": 5
-                      },
-                      "testId": {
-                        "type": "integer",
-                        "description": "Идентификатор теста, к которому относится вопрос",
-                        "format": "int64",
-                        "example": 10
-                      },
-                      "answers": {
-                        "type": "array",
-                        "description": "Список ответов",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "integer",
-                              "description": "Идентификатор ответа",
-                              "format": "int64",
-                              "readOnly": true,
-                              "example": 1
-                            },
-                            "answerText": {
-                              "type": "string",
-                              "description": "Текст ответа",
-                              "example": "Объектно-ориентированное программирование"
-                            },
-                            "isCorrect": {
-                              "type": "boolean",
-                              "description": "Является ли ответ правильным",
-                              "example": true
-                            },
-                            "questionId": {
-                              "type": "integer",
-                              "description": "Идентификатор вопроса, к которому относится ответ",
-                              "format": "int64",
-                              "example": 5
-                            }
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Идентификатор вопроса",
+                            "format": "int64",
+                            "readOnly": true,
+                            "example": 1
                           },
-                          "description": "Ответ на вопрос"
-                        }
+                          "questionText": {
+                            "type": "string",
+                            "description": "Текст вопроса",
+                            "example": "Что такое ООП?"
+                          },
+                          "questionType": {
+                            "type": "string",
+                            "description": "Тип вопроса",
+                            "example": "SINGLE_CHOICE",
+                            "enum": [
+                              "SINGLE_CHOICE",
+                              "MULTIPLE_CHOICE",
+                              "TEXT"
+                            ]
+                          },
+                          "points": {
+                            "type": "integer",
+                            "description": "Количество баллов за вопрос",
+                            "format": "int32",
+                            "example": 5
+                          },
+                          "testId": {
+                            "type": "integer",
+                            "description": "Идентификатор теста, к которому относится вопрос",
+                            "format": "int64",
+                            "example": 10
+                          },
+                          "answers": {
+                            "type": "array",
+                            "description": "Список ответов",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "integer",
+                                  "description": "Идентификатор ответа",
+                                  "format": "int64",
+                                  "readOnly": true,
+                                  "example": 1
+                                },
+                                "answerText": {
+                                  "type": "string",
+                                  "description": "Текст ответа",
+                                  "example": "Объектно-ориентированное программирование"
+                                },
+                                "isCorrect": {
+                                  "type": "boolean",
+                                  "description": "Является ли ответ правильным",
+                                  "example": true
+                                },
+                                "questionId": {
+                                  "type": "integer",
+                                  "description": "Идентификатор вопроса, к которому относится ответ",
+                                  "format": "int64",
+                                  "example": 5
+                                }
+                              },
+                              "description": "Ответ на вопрос"
+                            }
+                          }
+                        },
+                        "description": "Вопрос теста"
                       }
                     },
-                    "description": "Вопрос теста"
-                  }
+                    "currentPage": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "totalElements": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "first": {
+                      "type": "boolean"
+                    },
+                    "last": {
+                      "type": "boolean"
+                    }
+                  },
+                  "description": "Страница"
                 }
               }
             }
@@ -2828,6 +2906,169 @@
                     }
                   },
                   "description": "Унифицированный ответ ошибки"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/v1/files/courses/{courseId}": {
+      "get": {
+        "tags": [
+          "Файлы курсов"
+        ],
+        "summary": "Получить список файлов курса (пагинация)",
+        "operationId": "getFiles",
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список файлов",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "currentPage": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "totalElements": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "first": {
+                      "type": "boolean"
+                    },
+                    "last": {
+                      "type": "boolean"
+                    }
+                  },
+                  "description": "Страница"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Файлы курсов"
+        ],
+        "summary": "Загрузить файл к курсу",
+        "operationId": "uploadFile",
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "description": "ID курса",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "description": "File to upload",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Файл загружен",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "ID файла",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "fileName": {
+                      "type": "string",
+                      "description": "Имя файла",
+                      "example": "presentation.pdf"
+                    },
+                    "filePath": {
+                      "type": "string",
+                      "description": "Путь к файлу на сервере",
+                      "example": "/uploads/courses/1/presentation.pdf"
+                    },
+                    "uploadedAt": {
+                      "type": "string",
+                      "description": "Дата загрузки",
+                      "format": "date-time"
+                    }
+                  },
+                  "description": "Файл, прикреплённый к курсу"
                 }
               }
             }
@@ -4966,13 +5207,231 @@
         ]
       }
     },
+    "/api/v1/tests/{id}/in-progress-attempt": {
+      "get": {
+        "tags": [
+          "Тесты"
+        ],
+        "summary": "Получить активную попытку пользователя по тесту",
+        "description": "Возвращает попытку пользователя для теста в статусе IN_PROGRESS",
+        "operationId": "getInProgressAttempt",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Идентификатор теста",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Активная попытка получена",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "description": "ID попытки",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "userId": {
+                      "type": "string",
+                      "description": "ID пользователя",
+                      "example": "123e4567-e89b-12d3-a456-426614174000"
+                    },
+                    "testId": {
+                      "type": "integer",
+                      "description": "ID теста",
+                      "format": "int64",
+                      "example": 10
+                    },
+                    "startedAt": {
+                      "type": "string",
+                      "description": "Время начала",
+                      "format": "date-time"
+                    },
+                    "finishedAt": {
+                      "type": "string",
+                      "description": "Время завершения",
+                      "format": "date-time"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Статус попытки",
+                      "example": "IN_PROGRESS"
+                    }
+                  },
+                  "description": "Попытка прохождения теста"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Пользователь не авторизован",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Временная метка ошибки",
+                      "example": "2024-05-20T14:30:45.123Z"
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "Код ошибки",
+                      "example": "USER_NOT_FOUND"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Сообщение об ошибке",
+                      "example": "Пользователь не найден"
+                    },
+                    "fieldErrors": {
+                      "type": "array",
+                      "description": "Ошибки валидации (только для ошибок валидации)",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Название поля",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Сообщение об ошибке",
+                            "example": "Email должен быть валидным"
+                          }
+                        },
+                        "description": "Ошибка валидации поля"
+                      }
+                    }
+                  },
+                  "description": "Унифицированный ответ ошибки"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Нет доступа",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Временная метка ошибки",
+                      "example": "2024-05-20T14:30:45.123Z"
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "Код ошибки",
+                      "example": "USER_NOT_FOUND"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Сообщение об ошибке",
+                      "example": "Пользователь не найден"
+                    },
+                    "fieldErrors": {
+                      "type": "array",
+                      "description": "Ошибки валидации (только для ошибок валидации)",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Название поля",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Сообщение об ошибке",
+                            "example": "Email должен быть валидным"
+                          }
+                        },
+                        "description": "Ошибка валидации поля"
+                      }
+                    }
+                  },
+                  "description": "Унифицированный ответ ошибки"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Нет активной попытки",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "timestamp": {
+                      "type": "string",
+                      "description": "Временная метка ошибки",
+                      "example": "2024-05-20T14:30:45.123Z"
+                    },
+                    "errorCode": {
+                      "type": "string",
+                      "description": "Код ошибки",
+                      "example": "USER_NOT_FOUND"
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Сообщение об ошибке",
+                      "example": "Пользователь не найден"
+                    },
+                    "fieldErrors": {
+                      "type": "array",
+                      "description": "Ошибки валидации (только для ошибок валидации)",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "field": {
+                            "type": "string",
+                            "description": "Название поля",
+                            "example": "email"
+                          },
+                          "message": {
+                            "type": "string",
+                            "description": "Сообщение об ошибке",
+                            "example": "Email должен быть валидным"
+                          }
+                        },
+                        "description": "Ошибка валидации поля"
+                      }
+                    }
+                  },
+                  "description": "Унифицированный ответ ошибки"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
     "/api/v1/tests/course/{courseId}": {
       "get": {
         "tags": [
           "Тесты"
         ],
         "summary": "Получение тестов курса",
-        "description": "Получить список всех тестов для указанного курса",
+        "description": "Получить список всех тестов для указанного курса с пагинацией",
         "operationId": "getCourseTests",
         "parameters": [
           {
@@ -4984,6 +5443,30 @@
               "type": "integer",
               "format": "int64"
             }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Номер страницы (начиная с 0)",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0
+            },
+            "example": 0
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "Количество элементов на странице",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10
+            },
+            "example": 10
           }
         ],
         "responses": {
@@ -4992,35 +5475,64 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "required": [
-                      "title"
-                    ],
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "description": "Идентификатор теста",
-                        "format": "int64"
-                      },
-                      "title": {
-                        "type": "string",
-                        "description": "Название теста"
-                      },
-                      "timeLimitMinutes": {
-                        "type": "integer",
-                        "description": "Лимит времени на прохождение (в минутах)",
-                        "format": "int32"
-                      },
-                      "passingScore": {
-                        "type": "integer",
-                        "description": "Проходной балл",
-                        "format": "int32"
+                  "type": "object",
+                  "properties": {
+                    "content": {
+                      "type": "array",
+                      "items": {
+                        "required": [
+                          "title"
+                        ],
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "integer",
+                            "description": "Идентификатор теста",
+                            "format": "int64"
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Название теста"
+                          },
+                          "timeLimitMinutes": {
+                            "type": "integer",
+                            "description": "Лимит времени на прохождение (в минутах)",
+                            "format": "int32"
+                          },
+                          "passingScore": {
+                            "type": "integer",
+                            "description": "Проходной балл",
+                            "format": "int32"
+                          },
+                          "maxAttempts": {
+                            "type": "integer",
+                            "description": "Максимальное количество попыток на тест",
+                            "format": "int32"
+                          }
+                        },
+                        "description": "Тест"
                       }
                     },
-                    "description": "Тест"
-                  }
+                    "currentPage": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "totalPages": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "totalElements": {
+                      "type": "integer",
+                      "format": "int64"
+                    },
+                    "first": {
+                      "type": "boolean"
+                    },
+                    "last": {
+                      "type": "boolean"
+                    }
+                  },
+                  "description": "Страница"
                 }
               }
             }
@@ -5216,6 +5728,90 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      }
+    },
+    "/api/v1/files/courses/{courseId}/file/{fileId}": {
+      "get": {
+        "tags": [
+          "Файлы курсов"
+        ],
+        "summary": "Скачать файл курса",
+        "operationId": "downloadFile",
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Файл скачан",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWT": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Файлы курсов"
+        ],
+        "summary": "Удалить файл курса",
+        "operationId": "deleteFile",
+        "parameters": [
+          {
+            "name": "courseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "fileId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Файл удалён"
           }
         },
         "security": [
@@ -5483,6 +6079,14 @@
             "description": "Проходной балл",
             "format": "int32",
             "example": 70
+          },
+          "maxAttempts": {
+            "maximum": 100,
+            "minimum": 1,
+            "type": "integer",
+            "description": "Максимальное количество попыток на тест",
+            "format": "int32",
+            "example": 3
           }
         },
         "description": "Запрос на создание/обновление теста"
@@ -5567,6 +6171,11 @@
           "passingScore": {
             "type": "integer",
             "description": "Проходной балл",
+            "format": "int32"
+          },
+          "maxAttempts": {
+            "type": "integer",
+            "description": "Максимальное количество попыток на тест",
             "format": "int32"
           }
         },
@@ -5926,6 +6535,33 @@
         },
         "description": "Вопрос теста"
       },
+      "CourseFileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID файла",
+            "format": "int64",
+            "example": 1
+          },
+          "fileName": {
+            "type": "string",
+            "description": "Имя файла",
+            "example": "presentation.pdf"
+          },
+          "filePath": {
+            "type": "string",
+            "description": "Путь к файлу на сервере",
+            "example": "/uploads/courses/1/presentation.pdf"
+          },
+          "uploadedAt": {
+            "type": "string",
+            "description": "Дата загрузки",
+            "format": "date-time"
+          }
+        },
+        "description": "Файл, прикреплённый к курсу"
+      },
       "RegistrationRequest": {
         "required": [
           "email",
@@ -6131,6 +6767,234 @@
           }
         },
         "description": "Результат прохождения теста"
+      },
+      "TestAttemptDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID попытки",
+            "format": "int64",
+            "example": 1
+          },
+          "userId": {
+            "type": "string",
+            "description": "ID пользователя",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "testId": {
+            "type": "integer",
+            "description": "ID теста",
+            "format": "int64",
+            "example": 10
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "Время начала",
+            "format": "date-time"
+          },
+          "finishedAt": {
+            "type": "string",
+            "description": "Время завершения",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "description": "Статус попытки",
+            "example": "IN_PROGRESS"
+          }
+        },
+        "description": "Попытка прохождения теста"
+      },
+      "PageDtoTestDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "required": [
+                "title"
+              ],
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "Идентификатор теста",
+                  "format": "int64"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Название теста"
+                },
+                "timeLimitMinutes": {
+                  "type": "integer",
+                  "description": "Лимит времени на прохождение (в минутах)",
+                  "format": "int32"
+                },
+                "passingScore": {
+                  "type": "integer",
+                  "description": "Проходной балл",
+                  "format": "int32"
+                },
+                "maxAttempts": {
+                  "type": "integer",
+                  "description": "Максимальное количество попыток на тест",
+                  "format": "int32"
+                }
+              },
+              "description": "Тест"
+            }
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        },
+        "description": "Страница"
+      },
+      "PageDtoQuestionDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "description": "Идентификатор вопроса",
+                  "format": "int64",
+                  "readOnly": true,
+                  "example": 1
+                },
+                "questionText": {
+                  "type": "string",
+                  "description": "Текст вопроса",
+                  "example": "Что такое ООП?"
+                },
+                "questionType": {
+                  "type": "string",
+                  "description": "Тип вопроса",
+                  "example": "SINGLE_CHOICE",
+                  "enum": [
+                    "SINGLE_CHOICE",
+                    "MULTIPLE_CHOICE",
+                    "TEXT"
+                  ]
+                },
+                "points": {
+                  "type": "integer",
+                  "description": "Количество баллов за вопрос",
+                  "format": "int32",
+                  "example": 5
+                },
+                "testId": {
+                  "type": "integer",
+                  "description": "Идентификатор теста, к которому относится вопрос",
+                  "format": "int64",
+                  "example": 10
+                },
+                "answers": {
+                  "type": "array",
+                  "description": "Список ответов",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "description": "Идентификатор ответа",
+                        "format": "int64",
+                        "readOnly": true,
+                        "example": 1
+                      },
+                      "answerText": {
+                        "type": "string",
+                        "description": "Текст ответа",
+                        "example": "Объектно-ориентированное программирование"
+                      },
+                      "isCorrect": {
+                        "type": "boolean",
+                        "description": "Является ли ответ правильным",
+                        "example": true
+                      },
+                      "questionId": {
+                        "type": "integer",
+                        "description": "Идентификатор вопроса, к которому относится ответ",
+                        "format": "int64",
+                        "example": 5
+                      }
+                    },
+                    "description": "Ответ на вопрос"
+                  }
+                }
+              },
+              "description": "Вопрос теста"
+            }
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        },
+        "description": "Страница"
+      },
+      "PageDto": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "currentPage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          }
+        },
+        "description": "Страница"
       },
       "PageDtoCourseDto": {
         "type": "object",

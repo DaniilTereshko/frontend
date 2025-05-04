@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import Alert from '../components/Alert';
@@ -15,19 +15,57 @@ function TestStartPage() {
   const [answers, setAnswers] = useState({}); // { [questionId]: value }
   const [questionsLoading, setQuestionsLoading] = useState(false);
   const [allQuestions, setAllQuestions] = useState([]); // Для номеров
+  const [inProgressAttempt, setInProgressAttempt] = useState(null);
+
+  useEffect(() => {
+    // Проверяем есть ли активная попытка
+    const fetchInProgress = async () => {
+      try {
+        const res = await api.get(`/api/v1/tests/${id}/in-progress-attempt`);
+        if (res.data) setInProgressAttempt(res.data);
+      } catch (e) {
+        // Не показываем ошибку если 404
+      }
+    };
+    fetchInProgress();
+  }, [id]);
 
   const handleStart = async () => {
     setLoading(true);
     setAlert(null);
     try {
+      // Получаем все вопросы для навигации
+      const allRes = await api.get(`/api/v1/questions/tests/${id}`, { params: { page: 0, size: 100 } });
+      const questionsArr = allRes.data?.content || [];
+      if (questionsArr.length === 0) {
+        setAlert('Тест пока не содержит вопросов');
+        setAlertType('error');
+        setLoading(false);
+        return;
+      }
       await api.post(`/api/v1/tests/${id}/start`);
+      setAllQuestions(questionsArr);
+      setStarted(true);
+      fetchQuestions(0);
+    } catch (err) {
+      setAlert(err.response?.data?.message || 'Ошибка при старте теста');
+      setAlertType('error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleContinue = async () => {
+    setLoading(true);
+    setAlert(null);
+    try {
       // Получаем все вопросы для навигации
       const allRes = await api.get(`/api/v1/questions/tests/${id}`, { params: { page: 0, size: 100 } });
       setAllQuestions(allRes.data?.content || []);
       setStarted(true);
       fetchQuestions(0);
     } catch (err) {
-      setAlert(err.response?.data?.message || 'Ошибка при старте теста');
+      setAlert('Ошибка при продолжении попытки');
       setAlertType('error');
     } finally {
       setLoading(false);
@@ -53,7 +91,7 @@ function TestStartPage() {
   };
 
   const handleSubmit = async () => {
-    const prepared = (questions.content.length ? questions.content : [question]).map(q => {
+    const prepared = (allQuestions.length ? allQuestions : questions.content).map(q => {
       if (q.questionType === 'TEXT') {
         return {
           questionId: q.id,
@@ -91,19 +129,42 @@ function TestStartPage() {
     <div className="container" style={{maxWidth: 600, margin: '60px auto 0 auto', display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
       {alert && <Alert message={alert} type={alertType} onClose={()=>setAlert(null)} side="left" />}
       {!started ? (
-        <>
-          <h2 style={{fontWeight:800,fontSize:'2.1rem',color:'#ff9800',marginBottom:40,letterSpacing:'0.5px',textAlign:'center'}}>Начать тест</h2>
+        <div style={{width:'100%',maxWidth:520,background:'#fffdfa',borderRadius:16,boxShadow:'0 2px 16px rgba(255,152,0,0.10)',padding:'36px 32px',marginTop:0,position:'relative',display:'flex',flexDirection:'column',alignItems:'center'}}>
           <button
             className="btn"
-            style={{fontWeight:800,fontSize:'1.5rem',padding:'32px 64px',borderRadius:16,background:'linear-gradient(90deg, #ff9800 60%, #ffa726 100%)',color:'#fff',border:'none',boxShadow:'0 4px 24px rgba(255,152,0,0.13)',letterSpacing:'1px',cursor:'pointer',transition:'background 0.2s, box-shadow 0.2s',marginBottom:24}}
+            style={{position:'absolute',left:24,top:24,fontWeight:700,fontSize:'1.08rem',padding:'8px 22px',borderRadius:8,background:'#eee',color:'#ff9800',border:'none',boxShadow:'0 2px 8px rgba(255,152,0,0.04)',letterSpacing:'0.5px',cursor:'pointer',zIndex:2}}
+            onClick={()=>navigate(-1)}
+          >
+            Назад
+          </button>
+          <h2 style={{fontWeight:800,fontSize:'2.1rem',color:'#ff9800',marginBottom:40,letterSpacing:'0.5px',textAlign:'center'}}>Начать тест</h2>
+          {inProgressAttempt && (
+            <button
+              className="btn"
+              style={{width:'100%',marginBottom:24,fontWeight:800,fontSize:'1.5rem',padding:'32px 64px',borderRadius:16,background:'linear-gradient(90deg, #e3e7fc 60%, #b3bcf7 100%)',color:'#3f51b5',border:'none',boxShadow:'0 4px 24px rgba(63,81,181,0.13)',letterSpacing:'1px',cursor:'pointer',transition:'background 0.2s, box-shadow 0.2s'}}
+              onClick={handleContinue}
+            >
+              Продолжить текущую попытку
+            </button>
+          )}
+          <button
+            className="btn"
+            style={{width:'100%',fontWeight:800,fontSize:'1.5rem',padding:'32px 64px',borderRadius:16,background:'linear-gradient(90deg, #ff9800 60%, #ffa726 100%)',color:'#fff',border:'none',boxShadow:'0 4px 24px rgba(255,152,0,0.13)',letterSpacing:'1px',cursor:'pointer',transition:'background 0.2s, box-shadow 0.2s',marginBottom:24}}
             onClick={handleStart}
             disabled={loading}
           >
             {loading ? 'Запуск...' : 'Начать тест'}
           </button>
-        </>
+        </div>
       ) : (
-        <div style={{width:'100%',maxWidth:520,background:'#fffdfa',borderRadius:16,boxShadow:'0 2px 16px rgba(255,152,0,0.10)',padding:'36px 32px',marginTop:0}}>
+        <div style={{width:'100%',maxWidth:520,background:'#fffdfa',borderRadius:16,boxShadow:'0 2px 16px rgba(255,152,0,0.10)',padding:'36px 32px',marginTop:0,position:'relative'}}>
+          <button
+            className="btn"
+            style={{position:'absolute',left:24,top:24,fontWeight:700,fontSize:'1.08rem',padding:'8px 22px',borderRadius:8,background:'#eee',color:'#ff9800',border:'none',boxShadow:'0 2px 8px rgba(255,152,0,0.04)',letterSpacing:'0.5px',cursor:'pointer',zIndex:2}}
+            onClick={()=>navigate(-1)}
+          >
+            Назад
+          </button>
           {/* Плашка с номерами вопросов */}
           {allQuestions.length > 0 && (
             <div style={{display:'flex',flexWrap:'wrap',gap:10,marginBottom:28,justifyContent:'center'}}>

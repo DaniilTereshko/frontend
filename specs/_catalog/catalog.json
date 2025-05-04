@@ -57,7 +57,7 @@
       {
         "path": "/api/v1/questions/tests/{testId}",
         "method": "get",
-        "description": "Получить список всех вопросов для указанного теста",
+        "description": "Получить список всех вопросов для указанного теста с пагинацией",
         "operationId": "getTestQuestions"
       },
       {
@@ -65,6 +65,16 @@
         "method": "post",
         "description": "Создать новый вопрос для указанного теста",
         "operationId": "create_1"
+      },
+      {
+        "path": "/api/v1/files/courses/{courseId}",
+        "method": "get",
+        "operationId": "getFiles"
+      },
+      {
+        "path": "/api/v1/files/courses/{courseId}",
+        "method": "post",
+        "operationId": "uploadFile"
       },
       {
         "path": "/api/v1/courses",
@@ -115,10 +125,26 @@
         "operationId": "getTestResults"
       },
       {
+        "path": "/api/v1/tests/{id}/in-progress-attempt",
+        "method": "get",
+        "description": "Возвращает попытку пользователя для теста в статусе IN_PROGRESS",
+        "operationId": "getInProgressAttempt"
+      },
+      {
         "path": "/api/v1/tests/course/{courseId}",
         "method": "get",
-        "description": "Получить список всех тестов для указанного курса",
+        "description": "Получить список всех тестов для указанного курса с пагинацией",
         "operationId": "getCourseTests"
+      },
+      {
+        "path": "/api/v1/files/courses/{courseId}/file/{fileId}",
+        "method": "get",
+        "operationId": "downloadFile"
+      },
+      {
+        "path": "/api/v1/files/courses/{courseId}/file/{fileId}",
+        "method": "delete",
+        "operationId": "deleteFile"
       },
       {
         "path": "/api/v1/questions/{id}",
@@ -181,6 +207,10 @@
         "description": "Вопрос теста"
       },
       {
+        "name": "CourseFileDto",
+        "description": "Файл, прикреплённый к курсу"
+      },
+      {
         "name": "RegistrationRequest",
         "description": "Запрос на регистрацию пользователя"
       },
@@ -203,6 +233,22 @@
       {
         "name": "TestResultDto",
         "description": "Результат прохождения теста"
+      },
+      {
+        "name": "TestAttemptDto",
+        "description": "Попытка прохождения теста"
+      },
+      {
+        "name": "PageDtoTestDto",
+        "description": "Страница"
+      },
+      {
+        "name": "PageDtoQuestionDto",
+        "description": "Страница"
+      },
+      {
+        "name": "PageDto",
+        "description": "Страница"
       },
       {
         "name": "PageDtoCourseDto",
