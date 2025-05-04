@@ -3,6 +3,9 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import HomePage from './pages/HomePage';
+import CoursePage from './pages/CoursePage';
+import QuestionPage from './pages/QuestionPage';
+import TestStartPage from './pages/TestStartPage';
 import { getUserFromToken, removeToken } from './utils/auth';
 
 function AppHeader() {
@@ -67,6 +70,9 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/courses/:id" element={<CoursePage />} />
+        <Route path="/tests/:testId/questions" element={<QuestionPage />} />
+        <Route path="/tests/:id/start" element={<TestStartPage />} />
         <Route path="/" element={<HomePage />} />
       </Routes>
     </>

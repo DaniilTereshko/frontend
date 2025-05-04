@@ -4,6 +4,7 @@ import { getUserFromToken } from '../utils/auth';
 import ValidationErrorList from '../components/ValidationErrorList';
 import Alert from '../components/Alert';
 import SidePanel from '../components/SidePanel';
+import { useNavigate } from 'react-router-dom';
 
 function CourseForm({ onSubmit, onCancel, initial, loading, errors }) {
   const [title, setTitle] = useState(initial?.title || '');
@@ -124,18 +125,20 @@ function AssignCoursePanel({ open, onClose, courseId, onAssigned, showAlert }) {
 }
 
 function CourseCard({ course, canEdit, onEdit, onDelete, onAssign }) {
+  const navigate = useNavigate();
   return (
     <div style={{background:'#fff',borderRadius:16,boxShadow:'0 2px 16px rgba(255,152,0,0.10)',padding:32,marginBottom:28,position:'relative',display:'flex',flexDirection:'column',gap:18, fontFamily:'Inter, Arial, sans-serif', minWidth:0, maxWidth: '100%'}}>
       <div style={{fontSize:'1.35rem',fontWeight:800,color:'#ff9800',marginBottom:4,letterSpacing:'0.5px'}}>{course.title}</div>
       <div style={{color:'#444',marginBottom:8, fontSize:'1.08rem', fontWeight:500}}>{course.description}</div>
       <div style={{fontSize:'0.99rem',color:'#888'}}>Создан: {new Date(course.createdAt).toLocaleString()} — <span style={{color:'#ff9800', fontWeight:600}}>{course.createdBy?.username}</span></div>
-      {canEdit && (
-        <div style={{display:'flex',gap:18,justifyContent:'center',alignItems:'center',marginTop:24}}>
+      <div style={{display:'flex',gap:18,justifyContent:'center',alignItems:'center',marginTop:24}}>
+        {canEdit && <>
           <button className="btn" style={{flex:1, fontWeight:700, fontSize:'1.08rem', padding:'12px 0', borderRadius:8, background:'linear-gradient(90deg, #ff9800 60%, #ffa726 100%)', color:'#fff', border:'none', boxShadow:'0 2px 8px rgba(255,152,0,0.10)', letterSpacing:'0.5px', cursor:'pointer', transition:'background 0.2s, box-shadow 0.2s'}} onClick={onEdit}>Редактировать</button>
           <button className="btn" style={{flex:1, fontWeight:700, fontSize:'1.08rem', padding:'12px 0', borderRadius:8, background:'#ffebee', color:'#c62828', border:'none', boxShadow:'0 2px 8px rgba(255,152,0,0.04)', letterSpacing:'0.5px', cursor:'pointer'}} onClick={onDelete}>Удалить</button>
           <button className="btn" style={{flex:1, fontWeight:700, fontSize:'1.08rem', padding:'12px 0', borderRadius:8, background:'#e3fcec', color:'#43a047', border:'none', boxShadow:'0 2px 8px rgba(67,160,71,0.08)', letterSpacing:'0.5px', cursor:'pointer'}} onClick={onAssign}>Назначить</button>
-        </div>
-      )}
+        </>}
+        <button className="btn" style={{flex:1, fontWeight:700, fontSize:'1.08rem', padding:'12px 0', borderRadius:8, background:'#fff3e0', color:'#ff9800', border:'none', boxShadow:'0 2px 8px rgba(255,152,0,0.04)', letterSpacing:'0.5px', cursor:'pointer'}} onClick={() => navigate(`/courses/${course.id}`)}>Перейти к курсу</button>
+      </div>
     </div>
   );
 }
